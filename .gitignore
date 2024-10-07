@@ -1,0 +1,38 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Service account credentials (Google API key file)
+config/*.json
+
+# Mac OS related files
+.DS_Store
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Debugging directories
+.vscode/
+.idea/
+
+# Production build files (optional)
+dist/
+
+# Miscellaneous
+*.swp
