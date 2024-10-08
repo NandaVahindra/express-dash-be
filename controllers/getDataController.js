@@ -3,7 +3,7 @@ const spreadsheetId = process.env.SPREADSHEET_ID;
 
 const getData = async (req, res) => {
     try {
-        const range = 'Sheet1!D2:D';
+        const range = 'Event 2024!D2:D';
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
