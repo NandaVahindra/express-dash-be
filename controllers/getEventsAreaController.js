@@ -1,7 +1,7 @@
 const sheets = require('../config/googleServiceAccount');
 const spreadsheetId = process.env.SPREADSHEET_ID;
 
-const getData = async (req, res) => {
+const getAreaData = async (req, res) => {
     try {
         const {month, category, action} = req.query;
 
@@ -18,9 +18,9 @@ const getData = async (req, res) => {
 
         // Filter the data based on query parameters
         const filteredData = values.filter(row => {
-            const eventMonth = row[0];  // Assuming the first column is the month
-            const eventCategory = row[5]; // Assuming the second column is the category
-            const eventAction = row[4]; // Assuming the third column is the action
+            const eventMonth = row[0];  
+            const eventCategory = row[5]; 
+            const eventAction = row[4]; 
             return (!month || eventMonth === month) &&
                    (!category || eventCategory === category) &&
                    (!action || eventAction === action);
@@ -46,7 +46,7 @@ const getData = async (req, res) => {
             revenue,
             payload
         };
-        // Return the result in a structured response
+
         return res.status(200).json({
             status: 'success',
             data: {
@@ -65,4 +65,4 @@ const getData = async (req, res) => {
     }
 };
 
-module.exports = getData;
+module.exports = getAreaData;
