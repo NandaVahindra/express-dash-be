@@ -1,11 +1,12 @@
 const sheets = require('../config/googleServiceAccount');
 const spreadsheetId = process.env.SPREADSHEET_ID;
+const sheetName = process.env.SHEET_NAME;
 
 const getAreaData = async (req, res) => {
     try {
         const {month, category, action} = req.query;
 
-        const range = 'Event 2024!F2:P';
+        const range = `${sheetName}!F2:P`;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -18,12 +19,12 @@ const getAreaData = async (req, res) => {
 
         // Filter the data based on query parameters
         const filteredData = values.filter(row => {
-            const eventMonth = row[0];  
-            const eventCategory = row[5]; 
-            const eventAction = row[4]; 
-            return (!month || eventMonth === month) &&
-                   (!category || eventCategory === category) &&
-                   (!action || eventAction === action);
+            const eventMonth = row[0] ? row[0].toLowerCase() : null;  
+            const eventCategory = row[5] ? row[5].toLowerCase() : null; 
+            const eventAction = row[4] ? row[4].toLowerCase() : null; 
+            return (!month || eventMonth === month.toLowerCase()) &&
+                   (!category || eventCategory === category.toLowerCase()) &&
+                   (!action || eventAction === action.toLowerCase());
         });
 
         // Sum the required columns safely, checking for valid numbers
@@ -38,14 +39,6 @@ const getAreaData = async (req, res) => {
         const revenue = sumColumn(filteredData, 7);
         const profitability = sumColumn(filteredData, 9);
         const payload = sumColumn(filteredData, 10);
-
-        const result = {
-            eventCounts,
-            opex,
-            profitability,
-            revenue,
-            payload
-        };
 
         return res.status(200).json({
             status: 'success',

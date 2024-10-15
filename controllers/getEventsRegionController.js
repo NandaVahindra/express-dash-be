@@ -1,12 +1,13 @@
 const sheets = require('../config/googleServiceAccount');
 const spreadsheetId = process.env.SPREADSHEET_ID;
+const sheetName = process.env.SHEET_NAME;
 
 const getEJRegionData = async (req, res) => {
     try {
         const {month, category, action} = req.query;
         const region = 'Jawa Timur';
 
-        const range = 'Event 2024!D2:P';
+        const range = `${sheetName}!D2:P`;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -19,14 +20,14 @@ const getEJRegionData = async (req, res) => {
 
         // Filter the data based on query parameters
         const filteredData = values.filter(row => {
-            const eventRegion = row[0];
-            const eventMonth = row[2];  
-            const eventCategory = row[7]; 
-            const eventAction = row[6]; 
-            return (!region || eventRegion === region) &&
-                   (!month || eventMonth === month) &&
-                   (!category || eventCategory === category) &&
-                   (!action || eventAction === action);
+            const eventRegion = row[0] ? row[0].toLowerCase() : null;
+            const eventMonth = row[2] ? row[2].toLowerCase() : null;  
+            const eventCategory = row[7] ? row[7].toLowerCase() : null; 
+            const eventAction = row[6] ? row[6].toLowerCase() : null; 
+            return (!region || eventRegion === region.toLowerCase()) &&
+                   (!month || eventMonth === month.toLowerCase()) &&
+                   (!category || eventCategory === category.toLowerCase()) &&
+                   (!action || eventAction === action.toLowerCase());
         });
 
         // Sum the required columns safely, checking for valid numbers
@@ -41,14 +42,6 @@ const getEJRegionData = async (req, res) => {
         const revenue = sumColumn(filteredData, 9);
         const profitability = sumColumn(filteredData, 11);
         const payload = sumColumn(filteredData, 12);
-
-        const result = {
-            eventCounts,
-            opex,
-            profitability,
-            revenue,
-            payload
-        };
 
         return res.status(200).json({
             status: 'success',
@@ -73,7 +66,7 @@ const getCJRegionData = async (req, res) => {
         const {month, category, action} = req.query;
         const region = 'Jawa Tengah';
 
-        const range = 'Event 2024!D2:P';
+        const range = `${sheetName}!D2:P`;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -86,14 +79,14 @@ const getCJRegionData = async (req, res) => {
 
         // Filter the data based on query parameters
         const filteredData = values.filter(row => {
-            const eventRegion = row[0];
-            const eventMonth = row[2];  
-            const eventCategory = row[7]; 
-            const eventAction = row[6]; 
-            return (!region || eventRegion === region) &&
-                   (!month || eventMonth === month) &&
-                   (!category || eventCategory === category) &&
-                   (!action || eventAction === action);
+            const eventRegion = row[0] ? row[0].toLowerCase() : null;
+            const eventMonth = row[2] ? row[2].toLowerCase() : null;  
+            const eventCategory = row[7] ? row[7].toLowerCase() : null; 
+            const eventAction = row[6] ? row[6].toLowerCase() : null; 
+            return (!region || eventRegion === region.toLowerCase()) &&
+                   (!month || eventMonth === month.toLowerCase()) &&
+                   (!category || eventCategory === category.toLowerCase()) &&
+                   (!action || eventAction === action.toLowerCase());
         });
 
         // Sum the required columns safely, checking for valid numbers
@@ -108,14 +101,6 @@ const getCJRegionData = async (req, res) => {
         const revenue = sumColumn(filteredData, 9);
         const profitability = sumColumn(filteredData, 11);
         const payload = sumColumn(filteredData, 12);
-
-        const result = {
-            eventCounts,
-            opex,
-            profitability,
-            revenue,
-            payload
-        };
 
         return res.status(200).json({
             status: 'success',
@@ -140,7 +125,7 @@ const getBNRegionData = async (req, res) => {
         const {month, category, action} = req.query;
         const region = 'Bali Nusra';
 
-        const range = 'Event 2024!D2:P';
+        const range = `${sheetName}!D2:P`;
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -153,14 +138,14 @@ const getBNRegionData = async (req, res) => {
 
         // Filter the data based on query parameters
         const filteredData = values.filter(row => {
-            const eventRegion = row[0];
-            const eventMonth = row[2];  
-            const eventCategory = row[7]; 
-            const eventAction = row[6]; 
-            return (!region || eventRegion === region) &&
-                   (!month || eventMonth === month) &&
-                   (!category || eventCategory === category) &&
-                   (!action || eventAction === action);
+            const eventRegion = row[0] ? row[0].toLowerCase() : null;
+            const eventMonth = row[2] ? row[2].toLowerCase() : null;  
+            const eventCategory = row[7] ? row[7].toLowerCase() : null; 
+            const eventAction = row[6] ? row[6].toLowerCase() : null; 
+            return (!region || eventRegion === region.toLowerCase()) &&
+                   (!month || eventMonth === month.toLowerCase()) &&
+                   (!category || eventCategory === category.toLowerCase()) &&
+                   (!action || eventAction === action.toLowerCase());
         });
 
         // Sum the required columns safely, checking for valid numbers
@@ -175,14 +160,6 @@ const getBNRegionData = async (req, res) => {
         const revenue = sumColumn(filteredData, 9);
         const profitability = sumColumn(filteredData, 11);
         const payload = sumColumn(filteredData, 12);
-
-        const result = {
-            eventCounts,
-            opex,
-            profitability,
-            revenue,
-            payload
-        };
 
         return res.status(200).json({
             status: 'success',
