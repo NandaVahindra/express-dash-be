@@ -10,6 +10,7 @@ const getEventsBNRegion = require('../controllers/getEventsRegionController').ge
 const getMonth = require('../controllers/getFilterDataController').getMonth;
 const getAction = require('../controllers/getFilterDataController').getAction;
 const getCategory = require('../controllers/getFilterDataController').getCategory;
+const clearCache = require('../controllers/clearCache');
 
 // Routes with auth middleware
 router.get('/eventsArea', auth, getEvents);
@@ -19,5 +20,6 @@ router.get('/eventsBNRegion', auth, getEventsBNRegion);
 router.get('/months', auth, getMonth);
 router.get('/actions', auth, getAction);
 router.get('/categories', auth, getCategory);
+router.post('/clearCache', auth, clearCache);
 
 module.exports = router;
