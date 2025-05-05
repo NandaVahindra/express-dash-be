@@ -1,6 +1,6 @@
 // cacheUtils.js
 const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 600 }); // Set TTL to 5 minutes or as needed
+const cache = new NodeCache({ stdTTL: 120 });
 
 // Cache helper functions
 function setCache(key, value) {

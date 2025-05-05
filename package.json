@@ -11,11 +11,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "firebase": "^11.6.0",
+    "firebase-admin": "^13.2.0",
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {

@@ -24,7 +24,7 @@ const fetchRegionData = async (region, query, res) => {
         const { month, category, action } = query;
 
         // Fetch data from Google Sheets
-        const range = `${sheetName}!D2:V`;
+        const range = `${sheetName}!A2:X`;
         // console.time(`Fetching data for region: ${region}`);
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
@@ -44,10 +44,10 @@ const fetchRegionData = async (region, query, res) => {
 
         // Filter the data based on query parameters and region
         const filteredData = values.filter(row => {
-            const eventRegion = row[0] ? row[0].toLowerCase() : null;
-            const eventMonth = row[2] ? row[2].toLowerCase() : null;
-            const eventCategory = row[7] ? row[7].toLowerCase() : null;
-            const eventAction = row[6] ? row[6].toLowerCase() : null;
+            const eventRegion = row[4] ? row[4].toLowerCase() : null;
+            const eventMonth = row[21] ? row[21].toLowerCase() : null;
+            const eventCategory = row[20] ? row[20].toLowerCase() : null;
+            const eventAction = row[19] ? row[19].toLowerCase() : null;
 
             const monthMatch = !queryMonths || queryMonths.includes(eventMonth);
             const categoryMatch = !queryCategories || queryCategories.includes(eventCategory);
@@ -65,26 +65,47 @@ const fetchRegionData = async (region, query, res) => {
         // Helper function to sum up column values
         const sumColumn = (data, index) => 
             data.reduce((total, row) => {
-                const value = Number(row[index]);
-                return !isNaN(value) ? total + value : total;
+                // Check if the value exists and is a string before applying replace
+                const value = row[index];
+                if (value && typeof value === 'string') {
+                    const cleanedValue = value.replace(/,/g, ''); // Remove commas
+                    const parsedValue = parseFloat(cleanedValue);
+                    return !isNaN(parsedValue) ? total + parsedValue : total;
+                }
+                return total; // Skip rows where the value is not valid
             }, 0);
 
         // Calculate the sums for the filtered data
-        const eventCounts = filteredData.length;
-        const opex = sumColumn(filteredData, 8);
-        const revenue = sumColumn(filteredData, 9);
-        const profitability = sumColumn(filteredData, 11);
-        const payload = sumColumn(filteredData, 14);
-        const user = sumColumn(filteredData, 18);
+        const eventCounts = new Set(filteredData.map(row => row[0])).size;
+        const opex = sumColumn(filteredData, 22);          // L column
+        const profitability = sumColumn(filteredData, 23); // O column
+
+        const revenue = sumColumn(filteredData, 10);       // M column
+        const revenueBaseline = sumColumn(filteredData, 9); // M column
+        const deltaRevenue = sumColumn(filteredData, 11);
+        const revenueGrowth = deltaRevenue / revenueBaseline * 100;
+
+        const user = sumColumn(filteredData, 13);         // L column
+        const deltaUser = sumColumn(filteredData, 14);    // L column
+        const userBaseline = sumColumn(filteredData, 12); // L column
+        const userGrowth = deltaUser / userBaseline * 100;
+
+        const payload = sumColumn(filteredData, 7);      // K column
+        const deltaPayload = sumColumn(filteredData, 8); // K column
+        const payloadBaseline = sumColumn(filteredData, 6); // K column
+        const payloadGrowth = deltaPayload / payloadBaseline * 100;
 
         const data = {
             eventCounts,
             totals: {
                 opex,
                 revenue,
+                revenueGrowth,
                 profitability,
                 payload,
-                user
+                payloadGrowth,
+                user,
+                userGrowth
             }
         };
 

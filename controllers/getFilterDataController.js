@@ -30,8 +30,12 @@ const fetchAndSortData = async (range, orderArray, errorMessage, res) => {
             return res.status(404).json({ message: errorMessage });
         }
 
-        // Remove duplicates by creating a Set and mapping
-        const uniqueItems = [...new Set(values.map(row => row[0]))];
+        // Filter out null, undefined, empty string values, and "#N/A", then convert to uppercase
+        const uniqueItems = [...new Set(values
+            .map(row => row[0])
+            .filter(item => item && item.trim() && item !== '#N/A') // Remove null, undefined, empty values, and "#N/A"
+            .map(item => item.toUpperCase()) // Convert to uppercase
+        )];
 
         // Sort based on the order array
         const sortedItems = uniqueItems.sort((a, b) => {
@@ -53,29 +57,29 @@ const fetchAndSortData = async (range, orderArray, errorMessage, res) => {
 // Controllers
 const getMonth = async (req, res) => {
     const monthOrder = [
-        "January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
+        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
     ];
-    const range = `${sheetName}!F2:F`;
+    const range = `${sheetName}!V2:V`;
     const errorMessage = 'No month data found';
     await fetchAndSortData(range, monthOrder, errorMessage, res);
 };
 
 const getAction = async (req, res) => {
     const actionOrder = [
-        "Optim Site", "Install Easymacro", "Install MassiveMIMO", "Install CMON", "Install Combat", "Install Repeater", 
-        "Add Sector", "Add New NE"
+        "OPTIM SITE", "INSTALL EASYMACRO", "INSTALL MASSIVEMIMO", "INSTALL CMON", "INSTALL COMBAT", "INSTALL REPEATER", 
+        "ADD SECTOR", "ADD NEW NE"
     ];
-    const range = `${sheetName}!J2:J`;
+    const range = `${sheetName}!T2:T`;
     const errorMessage = 'No action data found';
     await fetchAndSortData(range, actionOrder, errorMessage, res);
 };
 
 const getCategory = async (req, res) => {
     const categoryOrder = [
-        "Local", "VIP Event", "International", "Enterprise", "Internal"
+        "LOCAL", "VIP EVENT", "INTERNATIONAL", "ENTERPRISE", "INTERNAL"
     ];
-    const range = `${sheetName}!K2:K`;
+    const range = `${sheetName}!U2:U`;
     const errorMessage = 'No category data found';
     await fetchAndSortData(range, categoryOrder, errorMessage, res);
 };

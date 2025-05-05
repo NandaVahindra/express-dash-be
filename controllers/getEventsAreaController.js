@@ -9,10 +9,17 @@ const { setCache, getCache } = require('../utils/cacheUtils');
  * @param {Number} index - The index of the column to sum
  * @returns {Number} The sum of the column values
  */
+
 const sumColumn = (data, index) => 
     data.reduce((total, row) => {
-        const value = parseFloat(row[index]);
-        return !isNaN(value) ? total + value : total;
+        // Check if the value exists and is a string before applying replace
+        const value = row[index];
+        if (value && typeof value === 'string') {
+            const cleanedValue = value.replace(/,/g, ''); // Remove commas
+            const parsedValue = parseFloat(cleanedValue);
+            return !isNaN(parsedValue) ? total + parsedValue : total;
+        }
+        return total; // Skip rows where the value is not valid
     }, 0);
 
 const getAreaData = async (req, res) => {
@@ -34,7 +41,7 @@ const getAreaData = async (req, res) => {
         const queryCategories = category ? category.toLowerCase().split(',') : null;
         const queryActions = action ? action.toLowerCase().split(',') : null;
 
-        const range = `${sheetName}!F2:V`;
+        const range = `${sheetName}!A2:X`;
         // console.time('Google Sheets API Request');
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
@@ -49,9 +56,9 @@ const getAreaData = async (req, res) => {
 
         // Filter the data based on multiple possible values in each query parameter
         const filteredData = values.filter(row => {
-            const eventMonth = row[0] ? row[0].toLowerCase() : null;   // F column
-            const eventCategory = row[5] ? row[5].toLowerCase() : null; // K column
-            const eventAction = row[4] ? row[4].toLowerCase() : null;   // J column
+            const eventMonth = row[21] ? row[21].toLowerCase() : null;   // F column
+            const eventCategory = row[20] ? row[20].toLowerCase() : null; // K column
+            const eventAction = row[19] ? row[19].toLowerCase() : null;   // J column
 
             const monthMatch = !queryMonths || queryMonths.includes(eventMonth);
             const categoryMatch = !queryCategories || queryCategories.includes(eventCategory);
@@ -65,21 +72,36 @@ const getAreaData = async (req, res) => {
         // }
 
         // Sum columns: F2:P assumes indices 6, 7, 9, 10, 12, 16 for the relevant columns
-        const eventCounts = filteredData.length;
-        const opex = sumColumn(filteredData, 6);          // L column
-        const revenue = sumColumn(filteredData, 7);       // M column
-        const profitability = sumColumn(filteredData, 9); // O column
-        const payload = sumColumn(filteredData, 12);      // K column
-        const user = sumColumn(filteredData, 16);         // L column
+        const eventCounts = new Set(filteredData.map(row => row[0])).size;
+        const opex = sumColumn(filteredData, 22);          // L column
+        const profitability = sumColumn(filteredData, 23); // O column
+
+        const revenue = sumColumn(filteredData, 10);       // M column
+        const revenueBaseline = sumColumn(filteredData, 9); // M column
+        const deltaRevenue = sumColumn(filteredData, 11);
+        const revenueGrowth = deltaRevenue / revenueBaseline * 100;
+
+        const user = sumColumn(filteredData, 13);         // L column
+        const deltaUser = sumColumn(filteredData, 14);    // L column
+        const userBaseline = sumColumn(filteredData, 12); // L column
+        const userGrowth = deltaUser / userBaseline * 100;
+
+        const payload = sumColumn(filteredData, 7);      // K column
+        const deltaPayload = sumColumn(filteredData, 8); // K column
+        const payloadBaseline = sumColumn(filteredData, 6); // K column
+        const payloadGrowth = deltaPayload / payloadBaseline * 100;
 
         const data = {
             eventCounts,
             totals: {
                 opex,
                 revenue,
+                revenueGrowth,
                 profitability,
                 payload,
-                user
+                payloadGrowth,
+                user,
+                userGrowth
             }
         };
         // Cache the data
